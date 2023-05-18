@@ -48,7 +48,7 @@ task run_merging {
         set -eux -o pipefail
 
         ## Run bcftools merge
-        bcftools merge --no-index -m both -l vcf_path_names_file --threads ~{threadCount} -Oz -o ~{group_name}.merged.vcf.gz
+        bcftools merge --no-index -m both -l ~{vcf_path_names_file} --threads ~{threadCount} -Oz -o ~{group_name}.merged.vcf.gz
         bcftools index -t -o ~{group_name}.merged.vcf.gz.tbi ~{group_name}.merged.vcf.gz
 
     >>>
