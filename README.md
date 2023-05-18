@@ -3,7 +3,7 @@ Simple workflow that merges individual sample VCFs to generate a single multi-sa
 
 ## Input considerations
 Required - List of VCF file paths. VCFs must be sorted, but not bgzipped. <br>
-Optional - Group name after merging
+Optional - Group name after merging. Default - "samples"
 
 ## Test locally
 ```
