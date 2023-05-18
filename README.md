@@ -1,4 +1,4 @@
-# merge_VCFs_wf
+# Merge VCFs workflow
 Simple workflow that merges individual sample VCFs to generate a single multi-sample VCF, using [bcftools](https://github.com/samtools/bcftools)
 
 ## Input considerations
