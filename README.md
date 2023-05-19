@@ -1,9 +1,10 @@
 # Merge VCFs workflow
-Simple workflow that merges individual sample VCFs to generate a single multi-sample VCF, using [bcftools](https://github.com/samtools/bcftools)
+Merge individual sample VCFs to create a unified multi-sample VCF, optionally allowing for modification of sample names.
 
 ## Input considerations
-Required - List of VCF file paths. VCFs must be sorted, but not bgzipped. <br>
-Optional - Group name after merging. Default - "samples"
+* List of VCF file paths. VCFs must be sorted, optionally bgzipped. (REQUIRED)
+* List of new sample names for each input VCF in the order they appear in the VCFs list. (OPTIONAL)
+* Group name after merging. Default - "samples" (OPTIONAL)
 
 ## Test locally
 ```
