@@ -10,9 +10,9 @@ workflow merge_VCFs {
 
     parameter_meta {
         VCF_FILES: "List of VCFs to merge. Can be gzipped/bgzipped."
-        SAMPLE_NAMES: "List of new sample names for each input VCF"
-        GROUP_NAME: "Name of group after merging"
-        SORT_VCFS: "Should the input VCF be sorted? Default is no (i.e. assuming they're already sorted)"
+        SAMPLE_NAMES: "List of new sample names for each input VCF. (OPTIONAL)"
+        GROUP_NAME: "Name of group after merging used in the output filenames. (OPTIONAL)"
+        SORT_VCFS: "Should the input VCF be sorted? Default is false (i.e. assuming they're already sorted).  (OPTIONAL)"
     }
 
     input {
@@ -51,40 +51,46 @@ task run_merging {
     command <<<
         set -eux -o pipefail
 
-        ## list VCFs
-        ## eventually sort them first
-        FID=1
-        for FF in ~{sep=" " vcf_files}
-        do
-            if [ ~{sort_vcfs} == "true" ]
-            then
-                bcftools sort -m 2G -Oz -o samp_$FID.vcf.gz $FF
-                echo samp_$FID.vcf.gz >> vcf_list.txt
+        ## list VCFs, renaming the sample names if necessary
+        if [[ "~{sep='' sample_names}" != "" ]]; then
+            ## write the new sample names in one file per sample
+            FID=1
+            for SAMP in ~{sep=" " sample_names}
+            do
+                echo $SAMP > sampname_${FID}.txt
                 FID=$((FID+1))
-            else
-                echo $FF >> vcf_list.txt
-            fi
-        done
+            done
+            ## rename sample in each VCF file (and add new VCF to the list)
+            FID=1
+            for FF in ~{sep=" " vcf_files}
+            do
+                bcftools reheader -s sampname_${FID}.txt --threads ~{threadCount} -o samp_$FID.renamed.vcf.gz $FF
+                echo samp_$FID.renamed.vcf.gz >> vcf_list.txt
+                FID=$((FID+1))
+            done
+        else
+            ## nothing to do, just copy the VCF list
+            cp ~{write_lines(vcf_files)} vcf_list.txt
+        fi
+            
+        ## Optional: sort the VCFs in the list
+        if [ ~{sort_vcfs} == "true" ]
+        then
+            FID=1
+            for FF in `cat vcf_list.txt`
+            do
+                bcftools sort -m 2G -Oz -o samp_$FID.sorted.vcf.gz $FF
+                echo samp_$FID.sorted.vcf.gz >> vcf_list.sorted.txt
+                FID=$((FID+1))
+            done
+            mv vcf_list.sorted.txt vcf_list.txt
+        fi
         
         ## Run bcftools merge
         bcftools merge --no-index -m both -l vcf_list.txt --threads ~{threadCount} -Oz -o ~{group_name}.merged.vcf.gz
 
-        ## if specified, change sample names in merged VCF
-        if [[ "~{sep='' sample_names}" != "" ]]; then
-            for SAMP in ~{sep=" " sample_names}
-            do
-                echo $SAMP >> sampnames.txt
-            done
-
-            bcftools reheader -s sampnames.txt --threads ~{threadCount} -o ~{group_name}.renamed.merged.vcf.gz ~{group_name}.merged.vcf.gz
-
-            ## replace the VCF
-            mv ~{group_name}.renamed.merged.vcf.gz ~{group_name}.merged.vcf.gz
-        fi
-
         ## Create index of merged VCF
         bcftools index -t -o ~{group_name}.merged.vcf.gz.tbi ~{group_name}.merged.vcf.gz
-
     >>>
 
     output {
