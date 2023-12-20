@@ -60,11 +60,11 @@ task run_merging {
                 echo $SAMP > sampname_${FID}.txt
                 FID=$((FID+1))
             done
-            ## rename sample in each VCF file (and add new VCF to the list)
+            ## split multi-allelic variants to bi-allelic and rename sample in each VCF file (and add new VCF to the list)
             FID=1
             for FF in ~{sep=" " vcf_files}
-            do
-                bcftools reheader -s sampname_${FID}.txt --threads ~{threadCount} -o samp_$FID.renamed.vcf.gz $FF
+            do                 
+                zcat $FF | bcftools norm -m -any --threads ~{threadCount} | bcftools reheader -s sampname_${FID}.txt --threads ~{threadCount} -o samp_$FID.renamed.vcf.gz
                 echo samp_$FID.renamed.vcf.gz >> vcf_list.txt
                 FID=$((FID+1))
             done
