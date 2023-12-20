@@ -86,8 +86,8 @@ task run_merging {
             mv vcf_list.sorted.txt vcf_list.txt
         fi
         
-        ## Run bcftools merge
-        bcftools merge --no-index -m both -l vcf_list.txt --threads ~{threadCount} -Oz -o ~{group_name}.merged.vcf.gz
+        ## Run bcftools merge (without creating multi-allelics)
+        bcftools merge --no-index -m none -l vcf_list.txt --threads ~{threadCount} -Oz -o ~{group_name}.merged.vcf.gz
 
         ## Create index of merged VCF
         bcftools index -t -o ~{group_name}.merged.vcf.gz.tbi ~{group_name}.merged.vcf.gz
