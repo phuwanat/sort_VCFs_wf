@@ -34,7 +34,7 @@ task run_sorting {
     }
     
     command <<<
-        bcftools view -r 1-22,X -Oz -o ~{out_name}.included.vcf.gz ~{vcf}
+	bcftools view -r 1-22,X -Oz -o ~{out_name}.included.vcf.gz ~{vcf}
 	bcftools sort -m 2G -Oz -o ~{out_name}.sorted.vcf.gz ~{out_name}.included.vcf.gz
     >>>
 
