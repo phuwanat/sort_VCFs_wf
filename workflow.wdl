@@ -34,6 +34,7 @@ task run_sorting {
     }
     
     command <<<
+	tabix -p vcf ~{vcf}
 	bcftools view -r 1-22,X -Oz -o ~{out_name}.included.vcf.gz ~{vcf}
 	tabix -p vcf ~{out_name}.included.vcf.gz
 	bcftools sort -m 2G -Oz -o ~{out_name}.sorted.vcf.gz ~{out_name}.included.vcf.gz
