@@ -30,7 +30,7 @@ task run_sorting {
         Int memSizeGB = 8
         Int threadCount = 2
         Int diskSizeGB = 5*round(size(vcf, "GB")) + 20
-	String out_name = basename(vcf, ".sorted.vcf.gz")
+	String out_name = basename(vcf, ".vcf.gz")
     }
     
     command <<<
