@@ -8,11 +8,7 @@ workflow sort_VCFs {
         description: "Sort VCF"
     }
 
-    parameter_meta {
-        VCF_FILES: "List of VCFs to sort. Can be gzipped/bgzipped."
-    }
-
-    input {
+     input {
         Array[File] vcf_files
     }
 
@@ -34,14 +30,15 @@ task run_sorting {
         Int memSizeGB = 8
         Int threadCount = 2
         Int diskSizeGB = 5*round(size(vcf, "GB")) + 20
+	String out_name = basename(input_file, ".sorted.vcf.gz")
     }
     
     command <<<
-	bcftools sort -m 2G -Oz -o samp_$FID.sorted.vcf.gz vcf
+	bcftools sort -m 2G -Oz -o ~{out_name} vcf
     >>>
 
     output {
-        File vcf = "~{group_name}.merged.vcf.gz"
+        File out_file = select_first(glob("*.sorted.vcf.gz"))
     }
 
     runtime {
