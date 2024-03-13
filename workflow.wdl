@@ -1,34 +1,33 @@
 version 1.0
 
-workflow merge_VCFs {
+workflow sort_VCFs {
 
     meta {
-	author: "Shloka Negi"
+	author: "Shloka Negi edited by Phuwanat"
         email: "shnegi@ucsc.edu"
-        description: "Merge individual sample VCFs to create a unified multi-sample VCF, optionally allowing for modification of sample names."
+        description: "Sort VCF"
     }
 
     parameter_meta {
-        VCF_FILES: "List of VCFs to merge. Can be gzipped/bgzipped."
+        VCF_FILES: "List of VCFs to sort. Can be gzipped/bgzipped."
     }
 
     input {
         Array[File] VCF_FILES
     }
     
-    call run_merging {
+    call run_sorting {
         input:
         vcf_files=VCF_FILES
     }
 
     output {
-        File sorted_vcf = run_merging.vcf
-        File merged_vcf_index = run_merging.vcf_index
+        File sorted_vcf = run_sorting.vcf
     }
 
 }
 
-task run_merging {
+task run_sorting {
     input {
         Array[File] vcf_files
         Int memSizeGB = 8
