@@ -13,30 +13,31 @@ workflow sort_VCFs {
     }
 
     input {
-        Array[File] VCF_FILES
-    }
-    
-    call run_sorting {
-        input:
-        vcf_files=VCF_FILES
+        Array[File] vcf_files
     }
 
+    scatter(this_file in vcf_files) {
+		call run_sorting { 
+			input: vcf = this_file, disk = disk, memory = memory, preemptible = preemptible
+		}
+	}
+
     output {
-        File sorted_vcf = run_sorting.vcf
+        Array[File] sorted_vcf = run_sorting.out_file
     }
 
 }
 
 task run_sorting {
     input {
-        Array[File] vcf_files
+        File vcf
         Int memSizeGB = 8
         Int threadCount = 2
-        Int diskSizeGB = 5*round(size(vcf_files, "GB")) + 20
+        Int diskSizeGB = 5*round(size(vcf, "GB")) + 20
     }
     
     command <<<
-	bcftools sort -m 2G -Oz -o samp_$FID.sorted.vcf.gz $FF
+	bcftools sort -m 2G -Oz -o samp_$FID.sorted.vcf.gz vcf
     >>>
 
     output {
