@@ -35,7 +35,7 @@ task run_sorting {
     
     command <<<
 	tabix -p vcf ~{vcf}
-	bcftools view -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX -Oz -o ~{out_name}.included.vcf.gz ~{vcf}
+	bcftools view -i 'FILTER="PASS"' -r chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX -Oz -o ~{out_name}.included.vcf.gz ~{vcf}
 	tabix -p vcf ~{out_name}.included.vcf.gz
 	bcftools annotate -x INFO,FORMAT ~{out_name}.included.vcf.gz -Oz -o ~{out_name}.included2.vcf.gz
 	tabix -p vcf ~{out_name}.included2.vcf.gz
